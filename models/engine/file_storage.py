@@ -8,12 +8,33 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
+    @property
+    def cities(self):
+        """Retruns Cities in state"""
+
+    def delete(self, obj=None):
+        """loop through __objects, compare each value
+        of key with cls argument wich is object
+        """
+        if obj:
+            id = obj.to_dict()["id"]
+            className = obj.to_dict()["__class__"]
+            keyName = className+"."+id
+            if keyName in FileStorage.__objects:
+                del (FileStorage.__objects[keyName])
+                self.save()
+
     def all(self, cls=None):
-        """Devuelve un diccionario de modelos actualmente almacenados"""
-        if cls is None:
+        """Returns a dictionary of models currently in storage"""
+        print_dict = {}
+        if cls:
+            className = cls.__name__
+            for k, v in FileStorage.__objects.items():
+                if k.split('.')[0] == className:
+                    print_dict[k] = str(v)
+            return print_dict
+        else:
             return FileStorage.__objects
-        return {k: v for k, v in FileStorage.__objects.items()
-                if type(val) == cls}
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -28,13 +49,6 @@ class FileStorage:
                 temp[key] = val.to_dict()
             json.dump(temp, f)
 
-    def delete(self, obj=None):
-        """Para eliminar obj de __objects si está dentro"""
-        if not obj:
-            return
-        key = "{}.{}".format(type(obj).__name__, obj.id)
-        del FileStorage.__objects[key]
-
     def reload(self):
         """Loads storage dictionary from file"""
         from models.base_model import BaseModel
@@ -44,7 +58,6 @@ class FileStorage:
         from models.city import City
         from models.amenity import Amenity
         from models.review import Review
-
         classes = {
                     'BaseModel': BaseModel, 'User': User, 'Place': Place,
                     'State': State, 'City': City, 'Amenity': Amenity,
@@ -58,7 +71,3 @@ class FileStorage:
                     self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
-
-    def close(self):
-        """Close for JSON"""
-        self.reload()
