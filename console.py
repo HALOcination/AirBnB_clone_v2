@@ -114,7 +114,15 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def dic_create(self, args):
-        """creates a dictionary from a list"""
+        """
+    Creates a dictionary from a list of key-value pairs.
+
+    Args:
+    - args (list): A list of strings in the format "key=value".
+
+    Returns:
+    - dict: A dictionary containing key-value pairs.
+    """
         dic = {}
         for arg in args:
             if "=" in arg:
@@ -126,10 +134,10 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     try:
                         value = int(value)
-                    except:
+                    except ValueError:
                         try:
                             value = float(value)
-                        except:
+                        except ValueError:
                             continue
                 dic[key] = value
         return (dic)
@@ -229,12 +237,11 @@ class HBNBCommand(cmd.Cmd):
                 print("** class doesn't exist **")
                 return
             for k, v in storage.all(HBNBCommand.classes[args]).items():
-            # for k, v in storage._FileStorage__objects.items():
-                # if k.split('.')[0] == args:
+
                 print_list.append(str(v))
         else:
             for k, v in storage.all().items():
-            # for k, v in storage._FileStorage__objects.items():
+
                 print_list.append(str(v))
 
         print(print_list)
